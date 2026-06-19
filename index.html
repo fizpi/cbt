@@ -86,15 +86,45 @@
     border-right: 1px solid var(--border);
   }
 
-  .section-tabs {
+  .section-tabs-wrap {
     background: #e8edf5;
     border-bottom: 1px solid var(--border);
-    padding: 0 12px;
+    flex-shrink: 0;
+  }
+  .section-tabs-toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .section-tabs-toggle:hover {
+    background: #dde7f7;
+    color: var(--blue);
+  }
+  .section-tabs {
+    background: #e8edf5;
+    border-top: 1px solid var(--border);
+    padding: 0 12px 6px;
     display: flex;
     gap: 4px;
     align-items: flex-end;
     flex-shrink: 0;
     flex-wrap: wrap;
+  }
+  .section-tabs-wrap.collapsed .section-tabs {
+    display: none;
+    border-top: none;
+  }
+  .section-tabs-wrap.collapsed .section-tabs-toggle {
+    justify-content: flex-start;
   }
   .section-tab {
     padding: 8px 18px;
@@ -397,7 +427,7 @@
     box-shadow: 0 4px 18px rgba(0,0,0,.1);
     width: 100%;
     max-width: 860px;
-    overflow: hidden;
+    overflow: auto;
   }
   .result-header {
     background: var(--header-bg);
@@ -711,7 +741,10 @@
 <div id="examBody" class="exam-body" style="display:none;">
   <!-- Question Panel -->
   <div class="question-panel">
-    <div class="section-tabs" id="sectionTabs"></div>
+    <div class="section-tabs-wrap collapsed" id="sectionTabsWrap">
+      <button class="section-tabs-toggle" id="sectionTabsToggle" onclick="toggleSectionTabs()">▸ Topics</button>
+      <div class="section-tabs" id="sectionTabs"></div>
+    </div>
 
     <div class="q-meta">
       <span class="q-num" id="qNumLabel">Question No. 1</span>
@@ -877,7 +910,9 @@ function startExam() {
   const title = document.getElementById('cfgTitle').value.trim() || 'CBT Exam';
   const timerMin = Math.max(1, parseInt(document.getElementById('cfgTimer').value) || 90);
   const markCorrect = parseFloat(document.getElementById('cfgCorrect').value) || 4;
-  const markNeg = parseFloat(document.getElementById('cfgNegative').value) || 1;
+  const rawNeg = document.getElementById('cfgNegative').value;
+  const rawNegNum = parseFloat(rawNeg);
+  const markNeg = Number.isFinite(rawNegNum) ? Math.max(0, rawNegNum) : 1;
   const qPerTopic = parseInt(document.getElementById('cfgQPerTopic').value) || 0;
 
   let raw = document.getElementById('cfgJson').value.trim();
@@ -955,7 +990,7 @@ function initExamUI() {
   document.getElementById('paletteExam').textContent = exam.cfg.title;
   document.getElementById('avatarInitial').textContent = exam.cfg.name.charAt(0).toUpperCase();
   document.getElementById('markPos').textContent = '+' + exam.cfg.correct;
-  document.getElementById('markNeg').textContent = '−' + exam.cfg.negative;
+  document.getElementById('markNeg').textContent = exam.cfg.negative === 0 ? '0' : '−' + exam.cfg.negative;
 
   buildSectionTabs();
   buildPaletteTopicSelect();
@@ -978,6 +1013,13 @@ function buildSectionTabs() {
     };
     container.appendChild(btn);
   });
+}
+
+function toggleSectionTabs() {
+  const wrap = document.getElementById('sectionTabsWrap');
+  const toggle = document.getElementById('sectionTabsToggle');
+  const collapsed = wrap.classList.toggle('collapsed');
+  toggle.textContent = collapsed ? '▸ Topics' : '▾ Topics';
 }
 
 function buildPaletteTopicSelect() {
