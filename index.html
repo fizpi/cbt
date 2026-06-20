@@ -31,7 +31,15 @@
     --palette-w: 260px;
   }
 
-  body { font-family: Arial, sans-serif; background: var(--bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
 
   /* ── HEADER ── */
   header {
@@ -157,6 +165,23 @@
     gap: 16px;
     flex-shrink: 0;
     font-size: 13px;
+  }
+  .drawer-toggle {
+    display: none;
+    margin-left: auto;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
+  }
+  .drawer-close{
+    display: none;
   }
   .q-num { font-weight: 700; color: #333; }
   .q-type-badge {
@@ -437,6 +462,21 @@
   }
   .result-header h2 { font-size: 20px; margin-bottom: 4px; }
   .result-header p { font-size: 13px; color: #aec6f0; }
+  .result-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 16px 0;
+  }
+  .btn-export {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
 
   .score-section {
     display: flex;
@@ -528,6 +568,45 @@
   }
   .review-item.expanded .review-item-body { display: block; }
   .review-q-text { color: #333; margin-bottom: 10px; line-height: 1.5; }
+
+  @media print {
+    body {
+      background: #fff !important;
+      overflow: visible !important;
+    }
+    #configScreen,
+    #examHeader,
+    #examBody,
+    #submitModal,
+    #timeUpModal {
+      display: none !important;
+    }
+    #resultsScreen {
+      display: flex !important;
+      padding: 0 !important;
+      background: #fff !important;
+    }
+    .result-card {
+      max-width: 100% !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+    .result-actions {
+      display: none !important;
+    }
+    .review-item {
+      break-inside: avoid;
+    }
+    .review-item-body {
+      display: block !important;
+    }
+    .review-item-header {
+      cursor: default !important;
+    }
+    .expand-icon {
+      display: none !important;
+    }
+  }
   .review-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .ro {
     padding: 6px 10px;
@@ -645,11 +724,102 @@
   ::-webkit-scrollbar-thumb:hover { background: #999; }
 
   /* responsive */
+  @media (max-width: 980px) {
+    .exam-body { flex-direction: column; }
+    .question-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    .right-panel { width: 100%; max-height: 50vh; }
+    .question-footer { justify-content: space-between; }
+    .btn-submit { margin-left: 0; }
+  }
+
+  @media (max-width: 768px) {
+    header {
+      height: auto;
+      min-height: var(--header-h);
+      padding: 10px 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .header-left,
+    .header-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .header-right { flex-wrap: wrap; }
+    .q-meta { flex-wrap: wrap; gap: 8px; }
+    .q-marks { margin-left: 0; }
+    .question-content { padding: 14px; }
+    .question-text { font-size: 14px; }
+    .options-list { gap: 8px; }
+    .option-item { padding: 10px 12px; font-size: 13px; }
+    .question-footer { padding: 10px 12px; }
+    .btn { padding: 8px 10px; font-size: 12px; }
+    .legend { grid-template-columns: 1fr 1fr; }
+    .palette-summary { grid-template-columns: 1fr 1fr; }
+  }
+
   @media (max-width: 640px) {
-    :root { --palette-w: 200px; }
+    :root { --palette-w: 100%; }
+    body { overflow-y: auto; }
+    body.drawer-open::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 998;
+      pointer-events: auto;
+    }
+    .exam-body { position: relative; overflow: visible; }
+    .question-panel {
+      min-height: 0;
+      overflow: visible;
+    }
+    .drawer-toggle { display: inline-flex; align-items: center; gap: 6px; }
+    .right-panel {
+      width: 88vw;
+      max-width: 360px;
+      position: fixed;
+      top: 0;
+      right: -100%;
+      bottom: 0;
+      z-index: 2000;
+      transition: right .25s ease;
+      box-shadow: -4px 0 16px rgba(0,0,0,.22);
+      max-height: none;
+      order: 0;
+    }
+    .drawer-close {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .right-panel.open {
+      right: 0;
+    }
     .timer-label { display: none; }
     #timerDisplay { font-size: 18px; }
-    .btn { padding: 7px 12px; font-size: 12px; }
+    .header-left { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .candidate-name { width: 100%; }
+    .question-footer { flex-direction: column; align-items: stretch; }
+    .btn { width: 100%; }
+    .btn-submit { margin-left: 0; padding: 10px; }
+    .config-body { padding: 18px; }
+    .config-header { padding: 18px 16px; }
+    .config-header h1 { font-size: 20px; }
+    .config-row { grid-template-columns: 1fr; }
+    .legend { grid-template-columns: 1fr; }
+    .palette-section-label { flex-wrap: wrap; gap: 6px; }
+    .palette-grid-container { max-height: 300px; }
+    .modal-body { padding: 16px; }
+    .modal-stats { grid-template-columns: 1fr; }
+    .score-section { flex-direction: column; }
     .result-summary-grid { grid-template-columns: repeat(2, 1fr); }
     .result-qreview { padding: 10px 12px; }
   }
@@ -672,12 +842,12 @@
 
       <div class="config-group">
         <label>Candidate Name</label>
-        <input type="text" id="cfgName" placeholder="Enter your name" value="John Doe">
+        <input type="text" id="cfgName" placeholder="Enter your name" value="Anajli">
       </div>
 
       <div class="config-group">
         <label>Exam Title</label>
-        <input type="text" id="cfgTitle" placeholder="e.g. IIT JEE Mains 2024" value="IIT JEE Mains 2024">
+        <input type="text" id="cfgTitle" placeholder="e.g. NCL, SSC-CGL, JSSC... " value="NCL Nursing Entrance 2026">
       </div>
 
       <div class="config-row">
@@ -750,6 +920,7 @@
       <span class="q-num" id="qNumLabel">Question No. 1</span>
       <span class="q-type-badge">MCQ Single</span>
       <span class="q-marks">Marks: <span class="mark-green" id="markPos">+4</span> | <span class="mark-red" id="markNeg">−1</span></span>
+      <button class="drawer-toggle" id="drawerToggle" onclick="togglePaletteDrawer()" aria-expanded="false">☰ Palette</button>
     </div>
 
     <div class="question-content">
@@ -769,6 +940,7 @@
 
   <!-- Right Palette Panel -->
   <div class="right-panel">
+    <button class="drawer-close" onclick="togglePaletteDrawer()" aria-label="Close palette">×</button>
     <div class="candidate-info">
       <div class="avatar" id="avatarInitial">J</div>
       <div class="cand-details">
@@ -804,6 +976,9 @@
     <div class="result-header">
       <h2 id="resultTitle">Exam Results</h2>
       <p id="resultSubtitle">IIT JEE Mains 2024 – Summary</p>
+    </div>
+    <div class="result-actions">
+      <button class="btn-export" onclick="exportResultsPDF()">Export PDF</button>
     </div>
 
     <div class="score-section">
@@ -1021,6 +1196,40 @@ function toggleSectionTabs() {
   const collapsed = wrap.classList.toggle('collapsed');
   toggle.textContent = collapsed ? '▸ Topics' : '▾ Topics';
 }
+
+function togglePaletteDrawer() {
+  const panel = document.querySelector('.right-panel');
+  const toggle = document.getElementById('drawerToggle');
+  const closeBtn = document.querySelector('.drawer-close');
+  const isOpen = panel.classList.toggle('open');
+  document.body.classList.toggle('drawer-open', isOpen);
+  if (toggle) toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  if (closeBtn) closeBtn.style.display = window.innerWidth <= 640 && isOpen ? 'block' : 'none';
+}
+
+window.addEventListener('resize', () => {
+  const panel = document.querySelector('.right-panel');
+  const closeBtn = document.querySelector('.drawer-close');
+  if (closeBtn && panel && !panel.classList.contains('open')) {
+    closeBtn.style.display = 'none';
+  } else if (closeBtn && panel && panel.classList.contains('open') && window.innerWidth <= 640) {
+    closeBtn.style.display = 'block';
+  }
+});
+
+document.addEventListener('click', (e) => {
+  const panel = document.querySelector('.right-panel');
+  const toggle = document.getElementById('drawerToggle');
+  if (
+    window.innerWidth <= 640 &&
+    panel &&
+    panel.classList.contains('open') &&
+    !panel.contains(e.target) &&
+    !toggle.contains(e.target)
+  ) {
+    togglePaletteDrawer();
+  }
+});
 
 function buildPaletteTopicSelect() {
   const sel = document.getElementById('paletteTopicSelect');
@@ -1343,6 +1552,10 @@ function toggleReview(el) {
   el.classList.toggle('expanded');
   const icon = el.querySelector('.expand-icon');
   if (icon) icon.textContent = el.classList.contains('expanded') ? '▲' : '▼';
+}
+
+function exportResultsPDF() {
+  window.print();
 }
 
 function formatTime(s) {
