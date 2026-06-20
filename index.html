@@ -549,6 +549,16 @@
   }
   .review-item-header:hover { background: #eef1f8; }
   .review-q-num { font-weight: 700; color: #333; min-width: 70px; }
+  .review-level {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: #e3f2fd;
+    color: var(--blue);
+    text-transform: capitalize;
+    flex-shrink: 0;
+  }
   .review-status {
     font-size: 11px;
     font-weight: 700;
@@ -919,6 +929,7 @@
     <div class="q-meta">
       <span class="q-num" id="qNumLabel">Question No. 1</span>
       <span class="q-type-badge">MCQ Single</span>
+      <span class="q-type-badge" id="difficultyBadge">Difficulty: Unknown</span>
       <span class="q-marks">Marks: <span class="mark-green" id="markPos">+4</span> | <span class="mark-red" id="markNeg">−1</span></span>
       <button class="drawer-toggle" id="drawerToggle" onclick="togglePaletteDrawer()" aria-expanded="false">☰ Palette</button>
     </div>
@@ -1128,6 +1139,7 @@ function startExam() {
         topicIdx: ti,
         localIdx: li,
         id: q.id,
+        level: q.level || 'unknown',
         description: q.description,
         options: q.options || [],
         correct_option: q.correct_option,
@@ -1277,6 +1289,9 @@ function renderQuestion(gIdx) {
   }
 
   document.getElementById('qNumLabel').textContent = `Question No. ${gIdx + 1} of ${exam.allQ.length}`;
+  const difficulty = (q.level || '').toString().trim();
+  document.getElementById('difficultyBadge').textContent = `Difficulty: ${difficulty || 'Unknown'}`;
+  console.log('Rendering question',q);
   document.getElementById('questionText').innerHTML = q.description;
 
   const list = document.getElementById('optionsList');
@@ -1532,10 +1547,12 @@ function showResults(timeTaken) {
       return `<div class="ro ${cls}">${labels[i] || (i+1)}. ${opt}${opt === q.correct_option ? ' ✓' : ''}${opt === r.selected && opt !== q.correct_option ? ' ✗' : ''}</div>`;
     }).join('');
 
+    const level = (q.level || 'Unknown').toString().trim() || 'Unknown';
     div.innerHTML = `
       <div class="review-item-header" onclick="toggleReview(this.parentElement)">
         <span class="review-q-num">Q${gi+1}</span>
         <span style="flex:1;color:#555;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${q.description.replace(/<[^>]*>/g,'').substring(0,60)}…</span>
+        <span class="review-level">${level}</span>
         <span class="review-status ${statusClass}">${status}</span>
         <span class="expand-icon">▼</span>
       </div>
